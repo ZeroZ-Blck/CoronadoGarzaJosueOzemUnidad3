@@ -1,6 +1,25 @@
 <?php
     require_once 'db_wallet_digital.php';
+    session_start();
+
+if (!isset($_SESSION['id']) || !isset($_SESSION['token_sesion'])) {
+    header("Location: iniciarS.php");
+    exit;
+}
+
+// Verificar que el token en la sesión siga siendo válido
+$stmt = $cnnPDO->prepare("SELECT token_sesion FROM usuarios WHERE id = :id");
+$stmt->bindParam(':id', $_SESSION['id']);
+$stmt->execute();
+$user = $stmt->fetch();
+
+if (!$user || $user['token_sesion'] !== $_SESSION['token_sesion']) {
+    session_destroy(); // Forzar cierre de sesión
+    header("Location: iniciarS.php");
+    exit;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

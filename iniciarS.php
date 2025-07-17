@@ -1,31 +1,41 @@
 <?php
+session_start();
 require_once 'db_wallet_digital.php';
 
-session_start();
-
 if (isset($_POST['buscar'])) {
-    $email = $_POST['email'];
+    $email = trim($_POST['email']);
+    $pasword = trim($_POST['pasword']);
 
     $query = $cnnPDO->prepare('SELECT * FROM usuarios WHERE email = :email');
     $query->bindParam(':email', $email);
     $query->execute();
 
-    $count = $query->rowCount();
-    $campo = $query->fetch();
+    $user = $query->fetch();
 
-    if ($count && $_POST['pasword'] == $campo['pasword']) {
-        $_SESSION['email'] = $campo['email'];
-        $_SESSION['pasword'] = $campo['pasword'];
-        $_SESSION['username'] = $campo['username'];
+    if ($user && $pasword === $user['pasword']) {
+        // Generar token de sesión único
+        $token = bin2hex(random_bytes(32));
+
+        // Guardar token en base de datos
+        $update = $cnnPDO->prepare("UPDATE usuarios SET token_sesion = :token WHERE id = :id");
+        $update->bindParam(':token', $token);
+        $update->bindParam(':id', $user['id']);
+        $update->execute();
+
+        // Guardar sesión
+        $_SESSION['id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['rol'] = $user['rol'];
+        $_SESSION['token_sesion'] = $token;
 
         header("Location: index.php");
-        exit();
+        exit;
     } else {
-        echo "<strong><font color='red'>El Usuario o la Contraseña son Incorrectos</font></strong>";
+        echo "<script>alert('Correo o contraseña incorrectos');</script>";
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
