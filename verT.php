@@ -3,6 +3,11 @@ require_once 'db_wallet_digital.php';
 
 session_start();
 
+if (!isset($_SESSION['id']) || !isset($_SESSION['username'])) {
+    header("Location: iniciarS.php");
+    exit;
+}
+
 if (!isset($_SESSION['username'])) {
     header("Location: index.php");
     exit();
