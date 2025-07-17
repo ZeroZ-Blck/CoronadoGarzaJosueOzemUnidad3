@@ -108,6 +108,7 @@ if (isset($_POST['buscar'])) {
             </div>
             <div class="d-grid">
                 <button type="submit" name="buscar" class="btn btn-primary">Iniciar Sesión</button>
+                <p><a href="recuperar.php">Recuperar Contraseña</a></p>
             </div>
         </form>
     </div>
